@@ -1,30 +1,25 @@
 use gtk::prelude::*;
 
 fn main() {
-    // Create a new application
-    let app = Application::builder()
-        .application_id("org.gtk-rs.example")
-        .build();
-
-    // Connect to "activate" signal of `app`
-    app.connect_activate(build_ui);
-
-    // Run the application
-    app.run();
+    build_ui();
 }
 
-fn build_ui(app: &Application) {
-    // Create a window and set the title
+fn build_ui() {
+    if gtk::init().is_err() {
+        println!("Failed to initialize GTK.");
+        return;
+    }
     let glade_src = include_str!("batstat.glade");
     let builder = gtk::Builder::from_string(glade_src);
 
-    let window = ApplicationWindow::builder()
-        .application(app)
-        .title("My GTK App")
-        .build();
+    let window: gtk::Window = builder.get_object("mainwindow").unwrap();
 
-    let window: gtk::Window = builder.object("mainwindow").unwrap();
-
+    // End program when closed 
+    window.connect_destroy( |_| { 
+        gtk::main_quit();
+    });
     // Present window to the user
     window.present();
+    // Begin the GTK process
+    gtk::main();
 }
